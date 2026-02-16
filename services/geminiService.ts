@@ -6,8 +6,8 @@ import { FoodAnalysisResult } from "../types";
  * Analisa um alimento via imagem (base64) ou texto usando o modelo Gemini.
  */
 export const analyzeFood = async (imageB64?: string, textQuery?: string): Promise<FoodAnalysisResult> => {
-  // Use o process.env.API_KEY diretamente. 
-  // O SDK deve ser instanciado logo antes do uso para garantir a chave mais atual.
+  // The API key is obtained exclusively from the environment variable process.env.API_KEY.
+  // We assume it is pre-configured and valid in the execution context.
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   
   const systemInstruction = `
@@ -65,7 +65,6 @@ export const analyzeFood = async (imageB64?: string, textQuery?: string): Promis
   const contentsParts: any[] = [];
   
   if (imageB64) {
-    // Remove o prefixo data:image/jpeg;base64, se existir
     const cleanBase64 = imageB64.includes(',') ? imageB64.split(',')[1] : imageB64;
     contentsParts.push({
       inlineData: {
@@ -85,8 +84,9 @@ export const analyzeFood = async (imageB64?: string, textQuery?: string): Promis
 
   try {
     const response = await ai.models.generateContent({
-      model: 'gemini-3-flash-preview',
-      contents: [{ parts: contentsParts }],
+      // Using gemini-3-pro-preview for complex reasoning and nutritional analysis tasks.
+      model: 'gemini-3-pro-preview',
+      contents: { parts: contentsParts },
       config: {
         systemInstruction,
         responseMimeType: "application/json",
@@ -94,14 +94,18 @@ export const analyzeFood = async (imageB64?: string, textQuery?: string): Promis
       },
     });
 
+    // Access the text property directly from the GenerateContentResponse object.
     const resultText = response.text;
     if (!resultText) {
-      throw new Error("O modelo não retornou conteúdo.");
+      throw new Error("O modelo não retornou um conteúdo válido.");
     }
 
     return JSON.parse(resultText) as FoodAnalysisResult;
   } catch (error) {
     console.error("Erro na análise do Gemini:", error);
-    throw new Error("Não foi possível analisar o alimento. Verifique sua conexão ou tente novamente.");
+    if (error instanceof Error) {
+      throw new Error(`Erro na IA: ${error.message}`);
+    }
+    throw new Error("Não foi possível analisar o alimento no momento.");
   }
 };

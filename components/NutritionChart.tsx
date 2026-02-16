@@ -9,10 +9,10 @@ interface Props {
 
 const NutritionChart: React.FC<Props> = ({ data }) => {
   const chartData = [
-    { name: 'Proteína', value: data.protein, color: '#3b82f6' },
-    { name: 'Carboidrato', value: data.carbs, color: '#f59e0b' },
-    { name: 'Gordura', value: data.fat, color: '#ef4444' },
-    { name: 'Fibra', value: data.fiber, color: '#10b981' },
+    { name: 'Proteína', value: data.protein || 0, color: '#3b82f6' },
+    { name: 'Carboidrato', value: data.carbs || 0, color: '#f59e0b' },
+    { name: 'Gordura', value: data.fat || 0, color: '#ef4444' },
+    { name: 'Fibra', value: data.fiber || 0, color: '#10b981' },
   ].filter(d => d.value > 0);
 
   return (
