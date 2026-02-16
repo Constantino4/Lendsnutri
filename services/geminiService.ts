@@ -1,3 +1,4 @@
+
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { FoodAnalysisResult } from "../types";
 
@@ -56,4 +57,4 @@ Idioma: Português Brasileiro.
   const text = result.response.text();
 
   return JSON.parse(text) as FoodAnalysisResult;
-};￼Enter
+};
