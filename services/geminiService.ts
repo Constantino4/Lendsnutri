@@ -1,13 +1,12 @@
 
-import { GoogleGenAI, Type } from "@google/generative-ai";
+import { GoogleGenAI, Type } from "@google/genai";
 import { FoodAnalysisResult } from "../types";
 
 /**
  * Analisa um alimento via imagem (base64) ou texto usando o modelo Gemini.
  */
 export const analyzeFood = async (imageB64?: string, textQuery?: string): Promise<FoodAnalysisResult> => {
-  // The API key is obtained exclusively from the environment variable process.env.API_KEY.
-  // We assume it is pre-configured and valid in the execution context.
+  // A chave da API é obtida exclusivamente da variável de ambiente process.env.API_KEY.
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   
   const systemInstruction = `
@@ -84,7 +83,6 @@ export const analyzeFood = async (imageB64?: string, textQuery?: string): Promis
 
   try {
     const response = await ai.models.generateContent({
-      // Using gemini-3-pro-preview for complex reasoning and nutritional analysis tasks.
       model: 'gemini-3-pro-preview',
       contents: { parts: contentsParts },
       config: {
@@ -94,7 +92,6 @@ export const analyzeFood = async (imageB64?: string, textQuery?: string): Promis
       },
     });
 
-    // Access the text property directly from the GenerateContentResponse object.
     const resultText = response.text;
     if (!resultText) {
       throw new Error("O modelo não retornou um conteúdo válido.");

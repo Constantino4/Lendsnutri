@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { FoodAnalysisResult } from '../types';
-import NutritionChart from './NutritionChart';
+import NutritionChart from '../NutritionChart';
 import Badge from './ui/Badge';
 import { 
   AlertTriangle, 
@@ -20,12 +20,6 @@ interface Props {
 }
 
 const AnalysisResult: React.FC<Props> = ({ result, imageUrl }) => {
-  const getScoreColor = (score: number) => {
-    if (score >= 80) return 'text-green-600';
-    if (score >= 50) return 'text-yellow-600';
-    return 'text-red-600';
-  };
-
   return (
     <div className="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500 hover:scale-[1.01] hover:shadow-2xl hover:shadow-indigo-100/50 transition-all duration-300">
       {/* Header with Image or Color block */}
