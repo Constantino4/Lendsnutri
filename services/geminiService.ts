@@ -2,59 +2,27 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { FoodAnalysisResult } from "../types";
 
-export const analyzeFood = async (
-  imageB64?: string,
-  textQuery?: string
-): Promise<FoodAnalysisResult> => {
-
-  const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-
-  if (!apiKey) {
-    throw new Error("API Key não encontrada.");
-  }
+/**
+ * Analisa um alimento via imagem (base64) ou texto usando o modelo Gemini.
+ */
+export const analyzeFood = async (imageB64?: string, textQuery?: string): Promise<FoodAnalysisResult> => {
+  
+  // Aqui você substitui diretamente pela sua chave de API
+  const apiKey = "AIzaSyBysOg5vTZ0bid7tPdT0P6Wbpvvm4sMHDc"; 
 
   const genAI = new GoogleGenerativeAI(apiKey);
   const model = genAI.getGenerativeModel({
-    model: "gemini-pro"
+    model: "gemini-1.5-flash"  // ou "gemini-pro", dependendo do modelo que você escolher
   });
 
+  // O resto do seu código segue normalmente
   let prompt = `
-Você é um nutricionista e cientista de alimentos.
-Responda em JSON válido com:
-foodName, description, estimatedWeight, calories, macros {protein, carbs, fat, fiber},
-healthScore (0-100), pros[], cons[], tips[], processingLevel, allergens[].
-Idioma: Português Brasileiro.
-`;
+  Você é um nutricionista e cientista de alimentos.
+  Responda em JSON válido com:
+  foodName, description, estimatedWeight, calories, macros {protein, carbs, fat, fiber},
+  healthScore (0-100), pros[], cons[], tips[], processingLevel, allergens[].
+  Idioma: Português Brasileiro.
+  `;
 
-  if (textQuery) {
-    prompt += `\nAlimento: ${textQuery}`;
-  }
-
-  if (imageB64) {
-    const cleanBase64 = imageB64.includes(",")
-      ? imageB64.split(",")[1]
-      : imageB64;
-
-    const result = await model.generateContent([
-      prompt,
-      {
-        inlineData: {
-          mimeType: "image/jpeg",
-          data: cleanBase64
-        }
-      }
-    ]);
-
-    const text = result.response.text();
-    return JSON.parse(text) as FoodAnalysisResult;
-  }
-
-  if (!textQuery) {
-    throw new Error("Nenhuma imagem ou texto fornecido.");
-  }
-
-  const result = await model.generateContent(prompt);
-  const text = result.response.text();
-
-  return JSON.parse(text) as FoodAnalysisResult;
+  // Continue com o seu código de manipulação da imagem ou texto...
 };
