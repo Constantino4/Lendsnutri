@@ -7,15 +7,13 @@ import { FoodAnalysisResult } from "../types";
  */
 export const analyzeFood = async (imageB64?: string, textQuery?: string): Promise<FoodAnalysisResult> => {
   
-  // Aqui você substitui diretamente pela sua chave de API
-  const apiKey = "AIzaSyBysOg5vTZ0bid7tPdT0P6Wbpvvm4sMHDc"; 
+  const apiKey = "AIzaSyBysOg5vTZ0bid7tPdT0P6Wbpvvm4sMHDc"; // Sua chave de API
 
   const genAI = new GoogleGenerativeAI(apiKey);
   const model = genAI.getGenerativeModel({
-    model: "gemini-1.5-flash"  // ou "gemini-pro", dependendo do modelo que você escolher
+    model: "gemini-1.5-flash",  // ou "gemini-pro", dependendo do modelo que você escolher
   });
 
-  // O resto do seu código segue normalmente
   let prompt = `
   Você é um nutricionista e cientista de alimentos.
   Responda em JSON válido com:
@@ -24,5 +22,38 @@ export const analyzeFood = async (imageB64?: string, textQuery?: string): Promis
   Idioma: Português Brasileiro.
   `;
 
-  // Continue com o seu código de manipulação da imagem ou texto...
+  // Se estiver usando uma imagem
+  if (imageB64) {
+    const cleanBase64 = imageB64.includes(",")
+      ? imageB64.split(",")[1]
+      : imageB64;
+    
+    // Chama o modelo com a imagem
+    const result = await model.generateContent([
+      prompt,
+      {
+        inlineData: {
+          mimeType: "image/jpeg",
+          data: cleanBase64
+        }
+      }
+    ]);
+
+    // Espera o resultado e retorna como JSON
+    const text = result.response.text();
+    return JSON.parse(text) as FoodAnalysisResult;
+  }
+
+  // Se não tiver imagem, mas tiver texto
+  if (textQuery) {
+    prompt += `\nAlimento para analisar: ${textQuery}`;
+    
+    const result = await model.generateContent(prompt);
+    const text = result.response.text();
+    
+    return JSON.parse(text) as FoodAnalysisResult;
+  }
+
+  // Caso nenhum dado (imagem ou texto) tenha sido fornecido
+  throw new Error("Nenhuma imagem ou texto fornecido para análise.");
 };
