@@ -11,7 +11,7 @@ export const analyzeFood = async (imageB64?: string, textQuery?: string): Promis
 
   const genAI = new GoogleGenerativeAI(apiKey);
   const model = genAI.getGenerativeModel({
-    model: "gemini2.5 flash"
+    model: "gemini-2.5-flash"
   });
 
   let prompt = `
