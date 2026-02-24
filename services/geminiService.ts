@@ -5,30 +5,32 @@ import { FoodAnalysisResult } from "../types";
 /**
  * Analisa um alimento via imagem (base64) ou texto usando o modelo Gemini.
  */
-export const analyzeFood = async (imageB64?: string, textQuery?: string): Promise<FoodAnalysisResult> => {
-  
-  const apiKey = "AIzaSyBysOg5vTZ0bid7tPdT0P6Wbpvvm4sMHDc"; // Sua chave de API
+export const analyzeFood = async (
+  imageB64?: string,
+  textQuery?: string
+): Promise<FoodAnalysisResult> => {
 
-  const genAI = new GoogleGenerativeAI(apiKey);
+  // Pega a chave da API da variável de ambiente
+  const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY);
+
   const model = genAI.getGenerativeModel({
-    model: "gemini-2.5-flash"
+    model: "gemini-2.5-flash" // Modelo que está liberado via API
   });
 
   let prompt = `
-  Você é um nutricionista e cientista de alimentos.
-  Responda em JSON válido com:
-  foodName, description, estimatedWeight, calories, macros {protein, carbs, fat, fiber},
-  healthScore (0-100), pros[], cons[], tips[], processingLevel, allergens[].
-  Idioma: Português Brasileiro.
-  `;
+Você é um nutricionista e cientista de alimentos.
+Responda em JSON válido com:
+foodName, description, estimatedWeight, calories, macros {protein, carbs, fat, fiber},
+healthScore (0-100), pros[], cons[], tips[], processingLevel, allergens[].
+Idioma: Português Brasileiro.
+`;
 
   // Se estiver usando uma imagem
   if (imageB64) {
     const cleanBase64 = imageB64.includes(",")
       ? imageB64.split(",")[1]
       : imageB64;
-    
-    // Chama o modelo com a imagem
+
     const result = await model.generateContent([
       prompt,
       {
@@ -39,7 +41,6 @@ export const analyzeFood = async (imageB64?: string, textQuery?: string): Promis
       }
     ]);
 
-    // Espera o resultado e retorna como JSON
     const text = result.response.text();
     return JSON.parse(text) as FoodAnalysisResult;
   }
